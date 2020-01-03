@@ -43,7 +43,6 @@ export default {
         })
         this.totals.push({ name: p, total: total })
       })
-      console.log(this.totals)
     }
   }
 }
