@@ -1,17 +1,50 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <input @change="fileSelected" type="file" accept=".csv">
+    <template v-if="totals.length">
+      <p v-for="total in totals" :key="total.name">{{ total.name }}: {{total.total}}</p>
+    </template>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Papa from 'papaparse'
 
 export default {
   name: 'app',
-  components: {
-    HelloWorld
+  data () {
+    return {
+      totals: []
+    }
+  },
+  methods: {
+    fileSelected () {
+      const input = document.querySelector('input[type=file')
+      Papa.parse(input.files[0], {
+        complete: this.parseComplete,
+        header: true
+      })
+    },
+
+    parseComplete (results) {
+      let products = []
+      results.data.forEach((e) => {
+        if (e['Product']) {
+          products.push(e['Product'])
+        }
+      })
+      products = Array.from(new Set(products)).sort()
+      products.forEach((p) => {
+        let total = 0
+        results.data.forEach((i) => {
+          if (i['Product'] === p) {
+            total += 1
+          }
+        })
+        this.totals.push({ name: p, total: total })
+      })
+      console.log(this.totals)
+    }
   }
 }
 </script>
